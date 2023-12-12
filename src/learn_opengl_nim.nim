@@ -46,20 +46,24 @@ proc initSDL() =
 
 proc processInput() =
   while pollEvent(evt):
-    if evt.kind == QuitEvent:
+    case evt.kind
+    of QuitEvent:
       runGame = false
       break
-    if evt.kind == KeyUp:
+
+    of KeyUp:
       if evt.key.keysym.scancode == SDL_SCANCODE_L:
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
       if evt.key.keysym.scancode == SDL_SCANCODE_P:
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
-    if evt.kind == WindowEvent:
-      var windowEvent = cast[WindowEventPtr](addr(evt))
-      if windowEvent.event == WindowEvent_Resized:
-        let newWidth = windowEvent.data1
-        let newHeight = windowEvent.data2
+
+    of WindowEvent:
+      if evt.window.event == WindowEvent_Resized:
+        let newWidth = evt.window.data1
+        let newHeight = evt.window.data2
         reshape(newWidth, newHeight)
+
+    else: discard
 
 proc processCompileStatus(shader: GLuint, status: GLint) =
   var
@@ -71,13 +75,13 @@ proc processCompileStatus(shader: GLuint, status: GLint) =
 
     # Query the log size
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, logSize.addr)
+
+    # Get the actual log string
     var logStr = cast[cstring](alloc(logSize))
     defer: dealloc(logStr)
-
     glGetShaderInfoLog(shader, logSize, logLength.addr, logStr)
+
     echo $logStr
-  else:
-    echo "Shader was compiled successfully"
 
 
 proc compileShader(vertSrcPath, fragSrcPath: string): cuint =
