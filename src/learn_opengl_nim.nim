@@ -12,16 +12,16 @@ var
   runGame = true
 
 const
-  vertices: array[18, GLfloat] = [
-    # First triangle
-    0.5, 0.5, 0.0,
-    0.5, -0.5, 0.0,
-    -0.5, 0.5, 0.0,
+  vertices: array[12, GLfloat] = [
+    0.5, 0.5, 0.0,   # Top right
+    0.5, -0.5, 0.0,  # Bottom right
+    -0.5, -0.5, 0.0, # Bottom left
+    -0.5, 0.5, 0.0,  # Top left
+  ]
 
-    # Second triangle
-    0.5, -0.5, 0.0,
-    -0.5, -0.5, 0.0,
-    -0.5, 0.5, 0.0
+  indices: array[6, GLuint] = [
+    0, 1, 3,         # First triangle
+    1, 2, 3          # Second triangle
   ]
 
 proc reshape(newWidth: cint, newHeight: cint) =
@@ -115,9 +115,10 @@ when isMainModule:
   initSDL()
 
   let shaderProgram = compileShader(r".\shaders\triangle_basic.vert", r".\shaders\triangle_basic.frag")
-  var vbo, vao: cuint
+  var vbo, ebo, vao: cuint
 
   glGenBuffers(1, vbo.addr)
+  glGenBuffers(1, ebo.addr)
 
   glGenVertexArrays(1, vao.addr)
   glBindVertexArray(vao)
@@ -125,6 +126,10 @@ when isMainModule:
   # Copy our vertices array in a buffer for OpenGL to use
   glBindBuffer(GL_ARRAY_BUFFER, vbo)
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vertices.len, vertices.addr, GL_STATIC_DRAW)
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo)
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.len,
+      indices.addr, GL_STATIC_DRAW)
 
   # Then set our vertex attributes pointers
   glVertexAttribPointer(0, 3, cGL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nil)
@@ -140,7 +145,9 @@ when isMainModule:
 
     glUseProgram(shaderProgram)
     glBindVertexArray(vao)
-    glDrawArrays(GL_TRIANGLES, 0, 6)
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nil)
+
+    glBindVertexArray(0)
     # End rendering
 
     window.glSwapWindow() # Swap the front and back frame buffers (double buffering)
