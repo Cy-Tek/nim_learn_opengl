@@ -12,16 +12,18 @@ var
   runGame = true
 
 const
-  vertices: array[12, GLfloat] = [
-    0.5, 0.5, 0.0,   # Top right
-    0.5, -0.5, 0.0,  # Bottom right
-    -0.5, -0.5, 0.0, # Bottom left
-    -0.5, 0.5, 0.0,  # Top left
+  vertices: array[15, GLfloat] = [
+    -0.5, -0.25, 0,
+    -0.25, 0.25, 0,
+    0, -0.25, 0,
+
+    0.25, 0.25, 0,
+    0.5, -0.25, 0
   ]
 
   indices: array[6, GLuint] = [
-    0, 1, 3,         # First triangle
-    1, 2, 3          # Second triangle
+    0, 1, 2, # First triangle
+    2, 3, 4  # Second triangle
   ]
 
 proc reshape(newWidth: cint, newHeight: cint) =
