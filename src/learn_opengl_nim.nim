@@ -50,10 +50,9 @@ proc processInput() =
       runGame = false
       break
     if evt.kind == KeyUp:
-      var keyEvent = cast[KeyboardEventPtr](addr(evt))
-      if keyEvent.keysym.scancode == SDL_SCANCODE_L:
+      if evt.key.keysym.scancode == SDL_SCANCODE_L:
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-      if keyEvent.keysym.scancode == SDL_SCANCODE_P:
+      if evt.key.keysym.scancode == SDL_SCANCODE_P:
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
     if evt.kind == WindowEvent:
       var windowEvent = cast[WindowEventPtr](addr(evt))
