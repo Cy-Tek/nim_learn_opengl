@@ -12,18 +12,20 @@ var
   runGame = true
 
 const
-  vertices: array[15, GLfloat] = [
+  verticesLeft: array[9, GLfloat] = [
     -0.5, -0.25, 0,
     -0.25, 0.25, 0,
-    0, -0.25, 0,
+    0, -0.25, 0
+  ]
 
+  verticesRight: array[9, GLfloat] = [
+    0, -0.25, 0,
     0.25, 0.25, 0,
     0.5, -0.25, 0
   ]
 
-  indices: array[6, GLuint] = [
-    0, 1, 2, # First triangle
-    2, 3, 4  # Second triangle
+  indices: array[3, GLuint] = [
+    0, 1, 2
   ]
 
 proc reshape(newWidth: cint, newHeight: cint) =
@@ -85,7 +87,6 @@ proc processCompileStatus(shader: GLuint, status: GLint) =
 
     echo $logStr
 
-
 proc compileShader(vertSrcPath, fragSrcPath: string): cuint =
   var
     vertexShader = glCreateShader(GL_VERTEX_SHADER)
@@ -126,17 +127,19 @@ when isMainModule:
   initSDL()
 
   let shaderProgram = compileShader(r".\shaders\triangle_basic.vert", r".\shaders\triangle_basic.frag")
-  var vbo, ebo, vao: cuint
+  var vboLeft, vboRight, ebo, vaoLeft, vaoRight: cuint
 
-  glGenBuffers(1, vbo.addr)
+  glGenBuffers(1, vboLeft.addr)
+  glGenBuffers(1, vboRight.addr)
   glGenBuffers(1, ebo.addr)
 
-  glGenVertexArrays(1, vao.addr)
-  glBindVertexArray(vao)
+  glGenVertexArrays(1, vaoLeft.addr)
+  glBindVertexArray(vaoLeft)
 
   # Copy our vertices array in a buffer for OpenGL to use
-  glBindBuffer(GL_ARRAY_BUFFER, vbo)
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vertices.len, vertices.addr, GL_STATIC_DRAW)
+  glBindBuffer(GL_ARRAY_BUFFER, vboLeft)
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * verticesLeft.len,
+      verticesLeft.addr, GL_STATIC_DRAW)
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo)
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.len,
@@ -146,6 +149,22 @@ when isMainModule:
   glVertexAttribPointer(0, 3, cGL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nil)
   glEnableVertexAttribArray(0)
 
+  glGenVertexArrays(1, vaoRight.addr)
+  glBindVertexArray(vaoRight)
+
+  glBindBuffer(GL_ARRAY_BUFFER, vboRight)
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * verticesRight.len,
+      verticesRight.addr, GL_STATIC_DRAW)
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo)
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.len,
+      indices.addr, GL_STATIC_DRAW)
+
+  # Then set our vertex attributes pointers
+  glVertexAttribPointer(0, 3, cGL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nil)
+  glEnableVertexAttribArray(0)
+
+  glBindVertexArray(0)
 
   while runGame:
     processInput()
@@ -155,8 +174,12 @@ when isMainModule:
     glClear(GL_COLOR_BUFFER_BIT) # Clear color and depth buffers
 
     glUseProgram(shaderProgram)
-    glBindVertexArray(vao)
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nil)
+
+    glBindVertexArray(vaoLeft)
+    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nil)
+
+    glBindVertexArray(vaoRight)
+    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nil)
 
     glBindVertexArray(0)
     # End rendering
