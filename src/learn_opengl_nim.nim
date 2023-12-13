@@ -126,7 +126,8 @@ proc compileShader(vertSrcPath, fragSrcPath: string): cuint =
 when isMainModule:
   initSDL()
 
-  let shaderProgram = compileShader(r".\shaders\triangle_basic.vert", r".\shaders\triangle_basic.frag")
+  let shaderProgramOrange = compileShader(r".\shaders\triangle_basic.vert", r".\shaders\triangle_basic.frag")
+  let shaderProgramYellow = compileShader(r".\shaders\triangle_basic.vert", r".\shaders\triangle_basic_yellow.frag")
   var vboLeft, vboRight, ebo, vaoLeft, vaoRight: cuint
 
   glGenBuffers(1, vboLeft.addr)
@@ -173,10 +174,12 @@ when isMainModule:
     glClearColor(0.2, 0.3, 0.3, 1.0) # Set background color to black and opaque
     glClear(GL_COLOR_BUFFER_BIT) # Clear color and depth buffers
 
-    glUseProgram(shaderProgram)
+    glUseProgram(shaderProgramOrange)
 
     glBindVertexArray(vaoLeft)
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nil)
+
+    glUseProgram(shaderProgramYellow)
 
     glBindVertexArray(vaoRight)
     glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nil)
