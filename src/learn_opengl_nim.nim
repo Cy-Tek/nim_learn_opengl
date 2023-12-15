@@ -21,8 +21,6 @@ const
     0, 1, 2
   ]
 
-  tickInterval = 60
-
 proc reshape(newWidth: cint, newHeight: cint) =
   screenWidth = newWidth
   screenHeight = newHeight
