@@ -1,6 +1,3 @@
-# OpenGL example using SDL2
-
-import math
 import sdl2
 import opengl
 
@@ -147,8 +144,8 @@ when isMainModule:
   glEnableVertexAttribArray(0)
 
   # Color attribute
-  glVertexAttribPointer(1, 3, cGL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), cast[
-      pointer](3 * sizeof(GLfloat)))
+  glVertexAttribPointer(1, 3, cGL_FLOAT, GL_FALSE,
+    6 * sizeof(GLfloat), cast[pointer](3 * sizeof(GLfloat)))
   glEnableVertexAttribArray(1)
 
   glUseProgram(shaderProgram)
@@ -157,8 +154,8 @@ when isMainModule:
     processInput()
 
     # Begin rendering
-    glClearColor(0.2, 0.3, 0.3, 1.0) # Set background color to black and opaque
-    glClear(GL_COLOR_BUFFER_BIT) # Clear color and depth buffers
+    glClearColor(0.2, 0.3, 0.3, 1.0)
+    glClear(GL_COLOR_BUFFER_BIT) # Clear color buffer
 
     glBindVertexArray(vao)
     glDrawArrays(GL_TRIANGLES, 0, 3)
