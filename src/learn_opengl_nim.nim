@@ -28,9 +28,10 @@ proc reshape(newWidth: cint, newHeight: cint) =
 
 proc initSDL() =
   discard sdl2.init(INIT_EVERYTHING)
-  window = createWindow("Learn OpenGL", SDL_WINDOWPOS_CENTERED,
-      SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL or
-      SDL_WINDOW_RESIZABLE)
+  window = createWindow("Learn OpenGL",
+      SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      screenWidth, screenHeight,
+      SDL_WINDOW_OPENGL or SDL_WINDOW_RESIZABLE)
 
   if isNil window:
     raiseAssert("Failed to initialize SDL2 window")
