@@ -150,20 +150,17 @@ when isMainModule:
   glVertexAttribPointer(0, 3, cGL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nil)
   glEnableVertexAttribArray(0)
 
-  var lastTicks = sdl2.getTicks()
   while runGame:
-    if float32(sdl2.getTicks() - lastTicks) < 1000 / tickInterval:
-      continue
-
-    lastTicks = sdl2.getTicks()
     processInput()
 
     # Begin rendering
     glClearColor(0.2, 0.3, 0.3, 1.0) # Set background color to black and opaque
     glClear(GL_COLOR_BUFFER_BIT) # Clear color and depth buffers
 
-    let greenValue = math.sin(ticksToSeconds(lastTicks)) / 2.0 + 0.5
-    let vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor")
+    let
+      tickSeconds = ticksToSeconds(sdl2.getTicks())
+      greenValue = math.sin(tickSeconds) / 2.0 + 0.5
+      vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor")
 
     glUseProgram(shaderProgram)
     glUniform4f(vertexColorLocation, 0.0, greenValue, 0.0, 1.0)
