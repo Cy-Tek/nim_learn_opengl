@@ -123,7 +123,7 @@ proc compileShader(vertSrcPath, fragSrcPath: string): cuint =
 when isMainModule:
   initSDL()
 
-  let shaderProgram = compileShader(r".\shaders\triangle_basic.vert", r".\shaders\triangle_basic.frag")
+  let shaderProgram = compileShader(r".\shaders\triangle.vert", r".\shaders\triangle.frag")
   var vbo, ebo, vao: cuint
 
   glGenBuffers(1, vbo.addr)
