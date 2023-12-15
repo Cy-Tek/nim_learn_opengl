@@ -1,5 +1,6 @@
 import sdl2
 import opengl
+import shader
 
 var
   screenWidth: cint = 640
@@ -63,65 +64,10 @@ proc processInput() =
 
     else: discard
 
-proc processCompileStatus(shader: GLuint, status: GLint) =
-  var
-    logSize: GLint
-    logLength: GLsizei
-
-  if status == 0:
-    echo "Shader wasn't compiled. Reason:"
-
-    # Query the log size
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, logSize.addr)
-
-    # Get the actual log string
-    var logStr = cast[cstring](alloc(logSize))
-    defer: dealloc(logStr)
-    glGetShaderInfoLog(shader, logSize, logLength.addr, logStr)
-
-    echo $logStr
-
-
-proc compileShader(vertSrcPath, fragSrcPath: string): cuint =
-  var
-    vertexShader = glCreateShader(GL_VERTEX_SHADER)
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER)
-    shaderProgram = glCreateProgram()
-    isCompiled: GLint
-
-  let
-    vertSrc = readFile(vertSrcPath)
-    vertShaderArray = allocCStringArray([vertSrc])
-    fragSrc = readFile(fragSrcPath)
-    fragShaderArray = allocCStringArray([fragSrc])
-
-  defer:
-    deallocCStringArray(vertShaderArray)
-    glDeleteShader(vertexShader)
-
-    deallocCStringArray(fragShaderArray)
-    glDeleteShader(fragmentShader)
-
-  glShaderSource(vertexShader, 1, vertShaderArray, nil)
-  glCompileShader(vertexShader)
-  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, isCompiled.addr)
-  processCompileStatus(vertexShader, isCompiled)
-
-  glShaderSource(fragmentShader, 1, fragShaderArray, nil)
-  glCompileShader(fragmentShader)
-  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, isCompiled.addr)
-  processCompileStatus(fragmentShader, isCompiled)
-
-  glAttachShader(shaderProgram, vertexShader)
-  glAttachShader(shaderProgram, fragmentShader)
-  glLinkProgram(shaderProgram)
-
-  return shaderProgram
-
 when isMainModule:
   initSDL()
 
-  let shaderProgram = compileShader(r".\shaders\triangle.vert", r".\shaders\triangle.frag")
+  let shaderProgram = initShader(r".\shaders\triangle.vert", r".\shaders\triangle.frag")
   var vbo, ebo, vao: cuint
 
   glGenBuffers(1, vbo.addr)
@@ -147,7 +93,7 @@ when isMainModule:
     6 * sizeof(GLfloat), cast[pointer](3 * sizeof(GLfloat)))
   glEnableVertexAttribArray(1)
 
-  glUseProgram(shaderProgram)
+  shaderProgram.use()
 
   while runGame:
     processInput()
