@@ -13,16 +13,15 @@ var
   runGame = true
 
 const
-  vertices: array[12, GLfloat] = [
-    0.5, 0.5, 0.0,   # Top right
-    0.5, -0.5, 0.0,  # Bottom right
-    -0.5, -0.5, 0.0, # Bottom left
-    -0.5, 0.5, 0.0,  # Top left
+  vertices: array[18, GLfloat] = [
+    # positions     # colors
+    0.5, -0.5, 0.0, 1.0, 0.0, 0.0,  # Top right
+    -0.5, -0.5, 0.0, 0.0, 1.0, 0.0, # Bottom right
+    0.0, 0.5, 0.0, 0.0, 0.0, 1.0    # Bottom left
   ]
 
-  indices: array[6, GLuint] = [
-    0, 1, 3,         # First triangle
-    1, 2, 3          # Second triangle
+  indices: array[3, GLuint] = [
+    0, 1, 2
   ]
 
   tickInterval = 60
@@ -123,9 +122,6 @@ proc compileShader(vertSrcPath, fragSrcPath: string): cuint =
 
   return shaderProgram
 
-proc ticksToSeconds(ticks: uint32): float32 =
-  float32(ticks) / 1000
-
 when isMainModule:
   initSDL()
 
@@ -147,8 +143,15 @@ when isMainModule:
       indices.addr, GL_STATIC_DRAW)
 
   # Then set our vertex attributes pointers
-  glVertexAttribPointer(0, 3, cGL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nil)
+  glVertexAttribPointer(0, 3, cGL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), nil)
   glEnableVertexAttribArray(0)
+
+  # Color attribute
+  glVertexAttribPointer(1, 3, cGL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), cast[
+      pointer](3 * sizeof(GLfloat)))
+  glEnableVertexAttribArray(1)
+
+  glUseProgram(shaderProgram)
 
   while runGame:
     processInput()
@@ -157,16 +160,8 @@ when isMainModule:
     glClearColor(0.2, 0.3, 0.3, 1.0) # Set background color to black and opaque
     glClear(GL_COLOR_BUFFER_BIT) # Clear color and depth buffers
 
-    let
-      tickSeconds = ticksToSeconds(sdl2.getTicks())
-      greenValue = math.sin(tickSeconds) / 2.0 + 0.5
-      vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor")
-
-    glUseProgram(shaderProgram)
-    glUniform4f(vertexColorLocation, 0.0, greenValue, 0.0, 1.0)
-
     glBindVertexArray(vao)
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nil)
+    glDrawArrays(GL_TRIANGLES, 0, 3)
 
     glBindVertexArray(0)
     # End rendering

@@ -1,9 +1,10 @@
 #version 330 core
 
 out vec4 FragColor;
-
-uniform vec4 ourColor;
+in vec3 vertexColor;
 
 void main() {
-    FragColor = ourColor;
+    float gamma = 2.2;
+    vec3 gammaCorrected = pow(vertexColor, vec3(1.0 / gamma));
+    FragColor = vec4(gammaCorrected, 1.0);
 } 
