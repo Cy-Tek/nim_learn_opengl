@@ -1,3 +1,4 @@
+import math
 import sdl2
 import opengl
 import shader
@@ -64,6 +65,10 @@ proc processInput() =
 
     else: discard
 
+proc getSeconds(): float32 {.inline.} =
+  let millis = sdl2.getTicks()
+  millis.float32 / 1000.0
+
 when isMainModule:
   initSDL()
 
@@ -101,6 +106,8 @@ when isMainModule:
     # Begin rendering
     glClearColor(0.2, 0.3, 0.3, 1.0)
     glClear(GL_COLOR_BUFFER_BIT) # Clear color buffer
+
+    shaderProgram.setFloat("hOffset", sin(getSeconds() * 2) / 2.0)
 
     glBindVertexArray(vao)
     glDrawArrays(GL_TRIANGLES, 0, 3)
